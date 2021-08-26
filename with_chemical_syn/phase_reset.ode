@@ -1,0 +1,58 @@
+# couple of LIF neurons
+v1'=-v1+Iext-gs*s2+gc*(v2-v1)
+v2'=-v2+Iext-gs*s1+gc*(v1-v2)
+
+# cheminal synapse alpha functions
+s1'=s1p
+s1p'=-2*alpha*s1p-alpha*alpha*s1
+
+s2'=s2p
+s2p'=-2*alpha*s2p-alpha*alpha*s2
+
+# initial conditions
+init v1=0.9,v2=0
+
+# external current function
+# originally it was set to 0.1 (for sent figures)
+Iext = if (spike_nb == 10 & abs(t-tpulse)<DtPulse) then (I_pulse) else (I_baseline)
+
+# tracking current
+aux I = Iext
+
+# tracking terms
+aux t1 = Iext-gs*s2
+aux t2 = Iext-gs*s1
+
+# tracking spikes & spike timings
+par tspike1=99, tspike2=99
+par tm1spike1=99, tm1spike2=99
+par tpulse = 99
+par spike_nb = 0
+aux nb = spike_nb
+
+# tracking phase difference
+aux phi = if(tm1spike2 > tm1spike1 & tm1spike2 < tspike1) then ((tspike1-tm1spike2)/(tspike1-tm1spike1)) else ((tspike1-tspike2)/(tspike1-tm1spike1))
+#aux phi = if(tm1spike1 > tm1spike2 & tm1spike1 < tspike2) then ((tspike2-tm1spike1)/(tspike2-tm1spike2)) else ((tspike2-tspike1)/(tspike2-tm1spike2))
+
+# detection of crossing of the thresholds
+# we reset and increment the voltages
+global 1 v1-vthr {v1=vreset; s1p=s1p+alpha*alpha; v2=v2+gc*beta; spike_nb=spike_nb+1; tm1spike1=tspike1; tspike1=t}
+global 1 v2-vthr {v2=vreset; v1=v1+gc*beta; s2p=s2p+alpha*alpha; tm1spike2=tspike2; tspike2=t}
+
+# If we reach the 10th spike, then current I_pulse is injected into both cells for a brief amount of time (note that it only has an effect on cell 2 since it is injected when cell 1 is resetting)
+global 0 spike_nb-10 {tpulse = t}
+
+# parameters
+par I_baseline=1.3, I_pulse=1.3, DtPulse=0.1, gc=0.1, gs=0.1, beta=0.1, alpha=2, vthr=1, vreset=0
+
+# set up plots
+@ total=100
+@ xlo=0, xhi=10, ylo=-0.1, yhi=3.1
+@ yp = v1
+@ delay = 10
+@ bound=20000
+
+# time step
+@ dt=0.0001
+
+done

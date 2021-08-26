@@ -1,0 +1,39 @@
+# couple LIF neurons
+v1'=-v1 + gamma*(v2-v1)+ Iext + 0.9
+v2'=-v2 + gamma*(v1-v2) + 0.9
+
+# external current function
+Iext = if (t>=5 & t<=spiket) then (I_value) else (0)
+
+# tracking current
+aux I = Iext
+
+# tracking spikes
+par spiket = 99
+par nbspike1 = 0
+
+# detection of crossing of the thresholds
+# we reset and increment the voltages
+global 1 v1-vthr {v1=vreset; v2=v2+gamma*beta; nbspike1=nbspike1+1}
+global 1 v2-vthr {v2=vreset; v1=v1+gamma*beta}
+
+global 0 v1-vthr {v1=vreset}
+global 0 v2-vthr {v2=vreset}
+
+global 0 nbspike1-1 {spiket = t}
+
+# ideal initial conditions for antiphase (can be calculated explicitly)
+init v1=0.8,v2=0.6
+
+# parameters
+par I_value=1.4, vthr=1, vreset=0, gamma=0.1, beta=0.2
+
+# set up plots
+@ total=100
+@ xlo=0, xhi=20, ylo=-0.1, yhi=3.1
+@ bound=20000
+
+# time step
+@ dt=0.0001
+
+done

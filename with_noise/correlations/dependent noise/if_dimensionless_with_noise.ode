@@ -1,0 +1,33 @@
+# Wiener processes
+wiener w
+
+# couple LIF neurons
+v1'=-v1+gamma*(v2-v1)+Iext+s1*w
+v2'=-v2+gamma*(v1-v2)+Iext+s2*w
+
+# initial conditions
+init v1=0.59,v2=0
+
+# tracking voltage difference between neurons
+aux diff=abs(V2-V1)
+
+# detection of crossing of the thresholds
+# we reset and increment the voltages
+global 1 v1-vthr {v1=vreset; v2=v2+gamma*beta}
+global 1 v2-vthr {v2=vreset; v1=v1+gamma*beta}
+
+global 0 v1-vthr {v1=vreset}
+global 0 v2-vthr {v2=vreset}
+
+# parameters
+par Iext=1.5, gamma=0.1, beta=0.1, s1=0.02, s2=0.02, vthr=1, vreset=0
+
+# set up plots
+@ bound=100000
+@ total=50000
+@ xlo=0, xhi=10, ylo=-0.1, yhi=3.1
+
+# time step
+@ dt=0.001
+
+done

@@ -1,0 +1,15 @@
+Tp = ln(I/(I-1))
+
+G1 = gc*(2/Tp)*(phi*sinh((1-phi)*Tp)-(1-phi)*sinh(phi*Tp)) + (gc*(beta/(I*Tp*Tp)))*(exp(phi*Tp)-exp((1-phi)*Tp))
+
+# phase difference evolution
+phi' = if(0<phi & phi<1) then (G1 ) else (0)
+
+init phi=0.5
+
+# parameters
+par I=2, gc=0.01, beta=0.1
+
+@ ylo=-0.1, yhi=1.1
+
+done

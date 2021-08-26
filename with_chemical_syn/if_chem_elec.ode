@@ -1,0 +1,36 @@
+# couple of LIF neurons
+v1'=-v1+Iext-gs*s2+gc*(v2-v1)
+v2'=-v2+Iext-gs*s1+gc*(v1-v2)
+
+# cheminal synapse alpha functions
+s1'=s1p
+s1p'=-2*alpha*s1p-alpha*alpha*s1
+
+s2'=s2p
+s2p'=-2*alpha*s2p-alpha*alpha*s2
+
+# initial conditions
+init v1=0.9,v2=0
+
+# detection of crossing of the thresholds
+# we reset and increment the voltages
+global 1 v1-vthr {v1=vreset; s1p=s1p+alpha*alpha; v2=v2+gc*beta}
+global 1 v2-vthr {v2=vreset; v1=v1+gc*beta; s2p=s2p+alpha*alpha}
+
+#global 0 v1-vthr {v1=vreset}
+#global 0 v2-vthr {v2=vreset}
+
+# parameters
+par Iext=1.3, DtPulse=0.1, gc=0.1, gs=0.1, beta=0.1, alpha=2, vthr=1, vreset=0
+
+# set up plots
+@ total=100
+@ xlo=0, xhi=10, ylo=-0.1, yhi=3.1
+@ yp = v1
+@ delay = 10
+@ bound=20000
+
+# time step
+@ dt=0.0001
+
+done

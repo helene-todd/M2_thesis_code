@@ -1,0 +1,5 @@
+I_base = 1.4
+I_injected = 1.6
+
+gamma = 0.01
+beta = 0.1

@@ -1,0 +1,6 @@
+gamma = 0.4
+beta = 0.1
+I = 1.5
+Ipulse = 1.8
+Dt = 0.25
+

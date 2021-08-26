@@ -1,0 +1,57 @@
+# couple LIF neurons
+v1'=-v1 + gamma*(v2-v1)+ Iext
+v2'=-v2 + gamma*(v1-v2)+ Iext
+
+# external current function
+# originally it was set to 0.1 (for sent figures)
+Iext = if (spike_nb == 10 & abs(t-tpulse)<DtPulse) then (I_pulse) else (I_baseline)
+
+# tracking current
+aux I = Iext
+
+# tracking voltage difference
+aux Vdiff = abs(V1 - V2)
+
+# tracking spikes & spike timings
+par tspike1=99, tspike2=99
+par tm1spike1=99, tm1spike2=99
+par tpulse = 99
+par spike_nb = 0
+aux nb = spike_nb
+
+# tracking phase difference
+aux phi = if(tm1spike2 > tm1spike1 & tm1spike2 < tspike1) then ((tspike1-tm1spike2)/(tspike1-tm1spike1)) else ((tspike1-tspike2)/(tspike1-tm1spike1))
+#aux phi = if(tm1spike1 > tm1spike2 & tm1spike1 < tspike2) then ((tspike2-tm1spike1)/(tspike2-tm1spike2)) else ((tspike2-tspike1)/(tspike2-tm1spike2))
+
+aux spikediffV1 = tspike1-tm1spike1
+aux spikediffV2 = tspike2-tm1spike2
+
+# detection of crossing of the thresholds
+# we reset and increment the voltages
+global 1 v1-vthr {v1=vreset; v2=v2+gamma*beta; spike_nb=spike_nb+1; tm1spike1=tspike1; tspike1=t}
+global 1 v2-vthr {v2=vreset; v1=v1+gamma*beta; tm1spike2=tspike2; tspike2=t}
+
+global 0 v1-vthr {v1=vreset}
+global 0 v2-vthr {v2=vreset}
+
+# If we reach the 10th spike, then current I_pulse is injected into both cells for a brief amount of time (note that it only has an effect on cell 2 since it is injected when cell 1 is resetting)
+global 0 spike_nb-10 {tpulse = t}
+
+# initial conditions
+# init v1=0.7101020514,v2=0 ideal for I=1.2
+init v1=0.3, v2=0 
+
+# parameters
+par I_baseline=1.2, I_pulse=1.2, DtPulse=0.1, gamma=0.1, beta=0.2, vthr=1, vreset=0
+
+@dt=0.000001
+
+# set up plots
+@ total=1000
+@ xlo=0, xhi=50, ylo=-0.1, yhi=3.1
+@ bound=20000
+
+# time step
+@ dt=0.0001
+
+done

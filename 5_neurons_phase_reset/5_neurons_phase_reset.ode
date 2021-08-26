@@ -1,0 +1,55 @@
+# couple LIF neurons
+v1'=-v1+gamma*(v2-v1)+gamma*(v3-v1)+gamma*(v4-v1)+gamma*(v5-v1)+Iext
+v2'=-v2+gamma*(v1-v2)+gamma*(v3-v2)+gamma*(v4-v2)+gamma*(v5-v2)+Iext
+v3'=-v3+gamma*(v1-v3)+gamma*(v2-v3)+gamma*(v4-v3)+gamma*(v5-v3)+I_baseline
+v4'=-v4+gamma*(v1-v4)+gamma*(v2-v4)+gamma*(v3-v4)+gamma*(v5-v4)+I_baseline
+v5'=-v5+gamma*(v1-v5)+gamma*(v2-v5)+gamma*(v3-v5)+gamma*(v4-v5)+I_baseline
+
+# external current function
+# originally it was set to 0.1 (for sent figures)
+Iext = if (spike_nb >= 10 & abs(t-tpulse)<DtPulse) then (I_pulse) else (I_baseline)
+
+# tracking current
+aux I = Iext
+
+# tracking timing of pulse current
+par tpulse = 99
+par spike_nb = 0
+
+# tracking phase difference
+# aux phi = if(tspike1 > tspike2) then ((tspike1-tspike2)/abs(tspike1-tm1spike1)) else ((tspike1-tm1spike2)/abs(tspike1-tm1spike1))
+
+# detection of crossing of the thresholds
+# we reset and increment the voltages
+global 1 v1-vthr {v1=vreset; v2=v2+gamma*beta; v3=v3+gamma*beta; v4=v4+gamma*beta; v5=v5+gamma*beta}
+global 1 v2-vthr {v2=vreset; v1=v1+gamma*beta; v3=v3+gamma*beta; v4=v4+gamma*beta; v5=v5+gamma*beta; spike_nb=spike_nb+1}
+global 1 v3-vthr {v3=vreset; v1=v1+gamma*beta; v2=v2+gamma*beta; v4=v4+gamma*beta; v5=v5+gamma*beta}
+global 1 v4-vthr {v4=vreset; v1=v1+gamma*beta; v2=v2+gamma*beta; v3=v3+gamma*beta; v5=v5+gamma*beta}
+global 1 v5-vthr {v5=vreset; v1=v1+gamma*beta; v2=v2+gamma*beta; v3=v3+gamma*beta; v4=v4+gamma*beta}
+
+global 0 v1-vthr {v1=vreset}
+global 0 v2-vthr {v2=vreset}
+global 0 v3-vthr {v3=vreset}
+global 0 v4-vthr {v4=vreset}
+global 0 v5-vthr {v5=vreset}
+
+# If we reach the 10th spike for neuron 2, then current I_pulse is injected into neurons 1 & 2 for a brief amount of time Dt (note that if Dt is small enough, it mostly has an effect on cell 2 since it is injected when cell 1 is resetting)
+global 0 spike_nb-10 {tpulse = t}
+
+# initial conditions
+init v1=0.6, v2=0, v3=0.4, v4=0.8, v5=0.9
+
+# parameters
+par I_baseline=1.1, I_pulse=1.1, DtPulse=0.1, vthr=1, vreset=0, gamma=0.05, beta=0.1
+
+@dt=0.000001
+
+# set up plots
+@ total=400
+@ xlo=0, xhi=50, ylo=-0.1, yhi=3.1
+@ bound=20000
+
+# time step
+@ dt=0.0001
+
+done

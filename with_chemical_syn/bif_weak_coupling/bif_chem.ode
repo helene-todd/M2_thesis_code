@@ -1,0 +1,18 @@
+Tp = ln(I/(I-1))
+
+A = alpha*alpha/(1-exp(-alpha*Tp))
+B = Tp*exp(-alpha*Tp)/(1-exp(-alpha*Tp))
+
+G2 = -(gs*A/(I*Tp*Tp*(1-alpha)*(1-alpha)))*((exp(-alpha*Tp)*((Tp+B)*(1-alpha)-1) - (B*(1-alpha)-1))*(exp(phi*Tp)-exp((1-phi)*Tp)) + (1-exp(-Tp))*(exp(phi*Tp)*exp((1-alpha)*(1-phi)*Tp)*(((1-phi)*Tp+B)*(1-alpha)-1)-exp((1-phi)*Tp)*exp((1-alpha)*phi*Tp)*((phi*Tp+B)*(1-alpha)-1)))
+
+# phase difference evolution
+phi' = if(0<phi & phi<1) then (G2 ) else (0)
+
+init phi=0.5
+
+# parameters
+par I=2, gs=0.01, alpha=4
+
+@ ylo=-0.1, yhi=1.1
+
+done

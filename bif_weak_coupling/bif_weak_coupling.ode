@@ -1,0 +1,11 @@
+# phase difference evolution
+phi' = if(0<phi & phi<1) then (gamma*(2/ln(I/(I-1)))*(phi*sinh((1-phi)*ln(I/(I-1)))-(1-phi)*sinh(phi*ln(I/(I-1)))) + (gamma*(beta/(I*ln(I/(I-1))*ln(I/(I-1)))))*(exp(phi*ln(I/(I-1)))-exp((1-phi)*ln(I/(I-1))))) else (0)
+
+init phi=0.5
+
+# parameters
+par I=2, gamma=0.01, beta=0.1
+
+@ ylo=-0.1, yhi=1.1
+
+done

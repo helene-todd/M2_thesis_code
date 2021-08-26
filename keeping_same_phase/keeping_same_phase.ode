@@ -1,0 +1,45 @@
+# couple LIF neurons
+v1'=-v1 + gamma*(v2-v1)+ Iext1
+v2'=-v2 + gamma*(v1-v2)+ Iext2
+
+# external current function
+Iext1 = if (t>=spiket1) then (I_pulse) else (I_baseline)
+Iext2 = if (t>=(spiket1+Dt)) then (I_pulse) else (I_baseline)
+
+# for exact phase preservation in low coupling, but this means we stay in equilibrium state
+# Iext2 = if (t>=(spiket1+log(((1-I_pulse)*sqrt(I_baseline*I_pulse/((I_baseline-1)*(I_pulse-1)))+I_baseline)/(I_baseline-I_pulse)) - 0.5*log(I_baseline/(I_baseline-1)))) then (I_pulse) else (I_baseline) 
+
+# tracking current
+aux I1 = Iext1
+aux I2 = Iext2
+
+# tracking spikes
+par spiket1 = 99, spiket2 = 99
+par nbspike1 = 0, nbspike2 = 0
+
+# detection of crossing of the thresholds
+# we reset and increment the voltages
+global 1 v1-vthr {v1=vreset; v2=v2+gamma*beta; nbspike1=nbspike1+1}
+global 1 v2-vthr {v2=vreset; v1=v1+gamma*beta; nbspike2=nbspike2+1}
+
+global 0 v1-vthr {v1=vreset}
+global 0 v2-vthr {v2=vreset}
+
+global 0 nbspike1-10 {spiket1 = t}
+global 0 nbspike2-10 {spiket2 = t}
+
+# ideal initial conditions for antiphase (can be calculated explicitly)
+init v1=0.7101020514,v2=0
+
+# parameters
+par I_baseline=1.2, I_pulse=1.4, gamma=0.01, beta=0.2, Dt=0.5, vthr=1, vreset=0
+
+# set up plots
+@ total=1000
+@ xlo=0, xhi=50, ylo=-0.1, yhi=3.1
+@ bound=20000
+
+# time step
+@ dt=0.0001
+
+done
